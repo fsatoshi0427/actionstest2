@@ -47,7 +47,7 @@ jobs:
 
       - name: RUun playit
         run:  |
-          systemctl status playit
+          screen -r playit.gg
           sleep 6h
 
       # - name: run playit
