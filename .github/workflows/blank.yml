@@ -47,6 +47,7 @@ jobs:
 
       - name: RUun playit
         run:  |
+          script /dev/null
           screen -r playit.gg
           sleep 6h
 
