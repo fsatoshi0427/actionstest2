@@ -43,6 +43,6 @@ jobs:
           sudo apt install playit
 
       - name: run playit
-      run: |
+        run: |
           playit
           sleep 6h;
