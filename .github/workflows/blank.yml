@@ -1,29 +1,44 @@
-# This is a basic workflow to help you get started with Actions
+name: SSH Server Installation and Configuration
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  deploy:
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      - name: Install SSH server
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openssh-server
+
+      - name: Configure SSH server
+        run: |
+          # パスワードなしのSSHアクセスを有効化
+          sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+          sudo systemctl restart ssh
+
+      - name: Set up SSH key
+        run: |
+          # SSH鍵の生成
+          ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+          # 公開鍵の表示
+          cat ~/.ssh/id_rsa.pub
+
+      - name: Display SSH public key
+        run: |
+          echo "SSH Public Key:"
+          cat ~/.ssh/id_rsa.pub
+      - name: playit
+        run: |
+          curl -SsL https://playit-cloud.github.io/ppa/key.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/playit.gpg >/dev/null
+          echo "deb [signed-by=/etc/apt/trusted.gpg.d/playit.gpg] https://playit-cloud.github.io/ppa/data ./" | sudo tee /etc/apt/sources.list.d/playit-cloud.list
+          sudo apt update
+          sudo apt install playit
+          sleep 6h;
